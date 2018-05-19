@@ -24,7 +24,7 @@ public class Repulse : MonoBehaviour {
 //			if (hit.gameObject.CompareTag("Explodeable"))
 //				hit.GetComponent<Rigidbody>().AddExplosionForce(force, pos , radius);
 
-			if (rb != null)
+			if (rb != null && rb.gameObject != this.gameObject)
 				rb.AddExplosionForce(force, pos , radius, upModifier);
 		}
 	}

@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour {
 	public float chargeTimer = 0;
 	private Vector3 moveDirection = Vector3.zero;
 	void Update() {
+        faceDirectionOfCamera();
+
 		CharacterController controller = GetComponent<CharacterController>();
 		if (controller.isGrounded) {
 			moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -18,8 +20,7 @@ public class PlayerController : MonoBehaviour {
 			moveDirection *= speed;
 			if (Input.GetButton("Jump"))
 				moveDirection.y = jumpSpeed;
-
-
+            
 		}
 
 		moveDirection.y -= gravity * Time.deltaTime;
@@ -41,5 +42,13 @@ public class PlayerController : MonoBehaviour {
 			controller.Move (moveDirection * Time.deltaTime);
 		}
 	}
+
+    private void faceDirectionOfCamera() {
+        Transform camTransform = Camera.main.GetComponent < Transform >();
+        float neededYRotation = camTransform.rotation.eulerAngles.y;
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+        currentRotation.y = neededYRotation;
+        transform.rotation = Quaternion.Euler(currentRotation);
+    }
 
 }
