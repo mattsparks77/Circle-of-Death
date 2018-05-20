@@ -5,22 +5,21 @@ using UnityEngine;
 //[ExecuteInEditMode]
 public class CameraThirdPerson : MonoBehaviour {
 
-    [SerializeField] Transform playerTarget;
-    bool cursorLocked;
+    static Transform playerTarget;
+    static bool cursorLocked;
 
     [SerializeField] [Range(1, 10)] float mouseSensitivity = 2;
     [SerializeField] [Range(-45, 0)] float minAngle = -25;
     [SerializeField] [Range(0, 75)] float maxAngle = 60;
-
-    // Use this for initialization
-    void Start () {
-        //if (Application.isPlaying) {
-        setCursorLock(true);
-        //}
-	}
-	
+    
 	// Update is called once per frame
 	void Update () {
+        if (!playerTarget) {
+            if (cursorLocked == true) {
+                setCursorLock(false);
+            }
+            return;
+        }
 
         setPositionToTarget();
 
@@ -70,8 +69,13 @@ public class CameraThirdPerson : MonoBehaviour {
         }
     }
 
-    void setCursorLock(bool lockCursor) {
+    static void setCursorLock(bool lockCursor) {
         cursorLocked = lockCursor;
         Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+    }
+
+    public static void SetPlayerTarget(Transform player) {
+        playerTarget = player;
+        setCursorLock(true);
     }
 }

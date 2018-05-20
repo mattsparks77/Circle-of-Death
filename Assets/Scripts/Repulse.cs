@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Repulse : MonoBehaviour {
+public class Repulse : NetworkBehaviour{
 
     public bool DrawDebugLines = false;
     [Range(1, 180)] public int hitAngles = 45;
@@ -13,9 +14,16 @@ public class Repulse : MonoBehaviour {
 
 	public float charge;
 	public float upModifier = 2f;
+
+    private PlayerController controller;
+
 	// Use this for initialization
 	void Start () {
-		
+        if (!isLocalPlayer) {
+            this.enabled = false;
+            return;
+        }
+        controller = GetComponent<PlayerController>();	
 	}
 	void toRepulse()
 	{
@@ -25,13 +33,24 @@ public class Repulse : MonoBehaviour {
 		foreach (Collider hit in hits)
 		{
 			Rigidbody rb = hit.GetComponent<Rigidbody> ();
-//			if (hit.gameObject.CompareTag("Explodeable"))
-//				hit.GetComponent<Rigidbody>().AddExplosionForce(force, pos , radius);
-
-			if (rb != null && rb.gameObject != this.gameObject && checkWithinHitRadius(hit))
-				rb.AddExplosionForce(force, pos , radius, upModifier);
+            //			if (hit.gameObject.CompareTag("Explodeable"))
+            //				hit.GetComponent<Rigidbody>().AddExplosionForce(force, pos , radius);
+            
+            if (rb != null && rb.gameObject != this.gameObject && checkWithinHitRadius(hit)) {
+                rb.AddExplosionForce(force, pos, radius, upModifier);
+                applyForceOnSelf(rb.transform.position);
+            }
 		}
 	}
+
+    //TODO make this work; it doesn't right now
+    private void applyForceOnSelf(Vector3 hitPosition) {
+        //controller.StunPlayer(.5f);
+        float diminishFactor = 2;
+        float newForce = force / diminishFactor;
+        float newUpModifier = upModifier / diminishFactor;
+        //GetComponent<Rigidbody>().AddExplosionForce(newForce, hitPosition, radius * 2, newUpModifier);
+    }
 
     bool checkWithinHitRadius(Collider hit) {
         // TODO may need change this, since hit.transform.position is not accurate: 
