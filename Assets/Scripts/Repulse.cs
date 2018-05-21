@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 
 public class Repulse : NetworkBehaviour{
 
+    //For debugging the repulse raycasting
     public bool DrawDebugLines = false;
 
     [Header("Repulsion Power")]
@@ -19,20 +20,20 @@ public class Repulse : NetworkBehaviour{
     [Range(0, 3)] public float repulseStunTime = 0.5f; //TODO make this used
     [Range(0, 3)] public float selfStunTime = 0.35f;
     private Collider[] hits;
-
     
-
     private PlayerController controller;
     
-
 	// Use this for initialization
 	void Start () {
+        //Check and disable this script if it's not a local player
         if (!isLocalPlayer) {
             this.enabled = false;
             return;
         }
         controller = GetComponent<PlayerController>();	
 	}
+
+    //Push whatever objects it hits backwards, as well as push the player back
 	void toRepulse()
 	{
 		Vector3 pos = transform.position;
@@ -51,9 +52,12 @@ public class Repulse : NetworkBehaviour{
 		}
 	}
 
-    //TODO make this work; it doesn't right now
+    //Apply the force on the player from the direction of where they hit an object, as well as a diminishing factor
     private void applyForceOnSelf(Vector3 hitPosition) {
+        //Stun the player for a small amount of time
+        //Without this, the players can instantly counter the force of the push with their movement
         controller.StunPlayer(selfStunTime);
+        //Don't apply force on self if the selfRepulseFactor is set to 0
         if (selfRepulseFactor == 0) {
             return;
         }
@@ -64,6 +68,7 @@ public class Repulse : NetworkBehaviour{
         playerRB.AddExplosionForce(newForce, hitPosition, radius, newUpModifier);
     }
 
+    //Checks if something is within the radius of getting hit
     bool checkWithinHitRadius(Collider hit) {
         // TODO may need change this, since hit.transform.position is not accurate: 
         // It needs to account for where the player was hit exactly
@@ -72,6 +77,7 @@ public class Repulse : NetworkBehaviour{
         print(degAngleOfHit);
         return degAngleOfHit < hitAngles;
     }
+
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyUp(KeyCode.Q))
@@ -81,6 +87,7 @@ public class Repulse : NetworkBehaviour{
 		}
 	}
 
+    //For debugging the repulse raycasts amount
     private void OnDrawGizmos() {
         if (!DrawDebugLines) {
             return;
