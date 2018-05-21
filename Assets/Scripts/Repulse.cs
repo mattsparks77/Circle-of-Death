@@ -6,16 +6,24 @@ using UnityEngine.Networking;
 public class Repulse : NetworkBehaviour{
 
     public bool DrawDebugLines = false;
+
+    [Header("Repulsion Power")]
+    public float radius = 10f;
+    public float force = 1000f;
+    private float charge;
+    public float upModifier = 2f;
+
+    [Header("Repulsion Details")]
     [Range(1, 180)] public int hitAngles = 45;
+    [Range(0, 2)] public float selfRepulseFactor = 0.5f;
+    [Range(0, 3)] public float repulseStunTime = 0.5f; //TODO make this used
+    [Range(0, 3)] public float selfStunTime = 0.35f;
+    private Collider[] hits;
 
-	public float force = 1000f;
-	public Collider[] hits;
-	public float radius = 10f;
-
-	public float charge;
-	public float upModifier = 2f;
+    
 
     private PlayerController controller;
+    
 
 	// Use this for initialization
 	void Start () {
@@ -45,10 +53,12 @@ public class Repulse : NetworkBehaviour{
 
     //TODO make this work; it doesn't right now
     private void applyForceOnSelf(Vector3 hitPosition) {
-        controller.StunPlayer(.5f);
-        float diminishFactor = 2;
-        float newForce = force / diminishFactor;
-        float newUpModifier = upModifier / diminishFactor;
+        controller.StunPlayer(selfStunTime);
+        if (selfRepulseFactor == 0) {
+            return;
+        }
+        float newForce = force * selfRepulseFactor;
+        float newUpModifier = upModifier * selfRepulseFactor;
         Rigidbody playerRB = GetComponent<Rigidbody>();
         playerRB.velocity = Vector3.zero;
         playerRB.AddExplosionForce(newForce, hitPosition, radius, newUpModifier);
