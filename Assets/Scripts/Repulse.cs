@@ -45,11 +45,13 @@ public class Repulse : NetworkBehaviour{
 
     //TODO make this work; it doesn't right now
     private void applyForceOnSelf(Vector3 hitPosition) {
-        //controller.StunPlayer(.5f);
+        controller.StunPlayer(.5f);
         float diminishFactor = 2;
         float newForce = force / diminishFactor;
         float newUpModifier = upModifier / diminishFactor;
-        //GetComponent<Rigidbody>().AddExplosionForce(newForce, hitPosition, radius * 2, newUpModifier);
+        Rigidbody playerRB = GetComponent<Rigidbody>();
+        playerRB.velocity = Vector3.zero;
+        playerRB.AddExplosionForce(newForce, hitPosition, radius, newUpModifier);
     }
 
     bool checkWithinHitRadius(Collider hit) {

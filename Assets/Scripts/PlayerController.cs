@@ -13,10 +13,12 @@ public class PlayerController : NetworkBehaviour {
 
     private float stunTimer = 0;
 
-    private CharacterController controller;
+    //private CharacterController controller;
+    private Rigidbody playerRB;
 
     void Start() {
-        controller = GetComponent<CharacterController>();
+        //controller = GetComponent<CharacterController>();
+        playerRB = GetComponent<Rigidbody>();
         if (isLocalPlayer) {
             CameraThirdPerson.SetPlayerTarget(transform);
         }
@@ -26,47 +28,68 @@ public class PlayerController : NetworkBehaviour {
     }
 
     void Update() {
-        faceDirectionOfCamera();
         decrementStunTimer();
-        
-		if (controller.isGrounded) {
+    }
+
+    void FixedUpdate() {
+        faceDirectionOfCamera();
+
+        if (isStunned()) {
+            Vector3 velocityWGravity = playerRB.velocity;
+            velocityWGravity.y -= gravity * Time.fixedDeltaTime;
+            playerRB.velocity = velocityWGravity;
+            return;
+        }
+
+        print(IsGrounded);
+
+        moveDirection.y -= gravity * Time.fixedDeltaTime;
+        if (IsGrounded) {
 			moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 			moveDirection = transform.TransformDirection(moveDirection);
 			moveDirection *= speed;
             if (isStunned()) {
                 moveDirection = Vector3.zero;
-            }
-            if (Input.GetButton("Jump"))
+            } else if (Input.GetButton("Jump"))
 				moveDirection.y = jumpSpeed;
             
 		}
-
-		moveDirection.y -= gravity * Time.deltaTime;
-		if (Input.GetKey (KeyCode.Mouse0)) {
+        
+        print("Move Direction: " + moveDirection);
+        print("Player Vel: " + playerRB.velocity);
+        if (Input.GetKey (KeyCode.Mouse0)) {
 			chargeTimer += Time.deltaTime;
 			Debug.Log (chargeTimer.ToString ());
 		}
 		if (Input.GetKeyUp (KeyCode.Mouse0) && chargeTimer > 2) {
 			Debug.Log ("MOVE: " +  moveDirection.ToString ());
-//			if (moveDirection.x <= 0) {
-//				transform.forward *= 2;
-//			}
-//				controller.Move(new Vector3(10f, -1*gravity * Time.deltaTime,0f));
-//			else {
-				controller.Move (moveDirection * Time.deltaTime * chargeTimer * 3f);
-				chargeTimer = 0;
+            //			if (moveDirection.x <= 0) {
+            //				transform.forward *= 2;
+            //			}
+            //				controller.Move(new Vector3(10f, -1*gravity * Time.deltaTime,0f));
+            //			else {
+            moveDirection = moveDirection * /*Time.deltaTime **/ chargeTimer * 3f;
+            //playerRB.velocity = moveDirection;
+            //playerRB.MovePosition (transform.position + moveDirection);
+            
+		    chargeTimer = 0;
 
-		} else {
-			controller.Move (moveDirection * Time.deltaTime);
 		}
-	}
+        playerRB.velocity = moveDirection;
+        //playerRB.MovePosition (transform.position + moveDirection * Time.deltaTime);
+        //playerRB.AddForce(moveDirection, ForceMode.VelocityChange);
+
+        if (playerRB.velocity.magnitude > speed) {
+            playerRB.velocity = playerRB.velocity.normalized * speed;
+        }
+    }
 
     private void faceDirectionOfCamera() {
         Transform camTransform = Camera.main.GetComponent < Transform >();
         float neededYRotation = camTransform.rotation.eulerAngles.y;
         Vector3 currentRotation = transform.rotation.eulerAngles;
         currentRotation.y = neededYRotation;
-        transform.rotation = Quaternion.Euler(currentRotation);
+        playerRB.MoveRotation (Quaternion.Euler(currentRotation));
     }
 
     private bool isStunned() {
@@ -84,5 +107,16 @@ public class PlayerController : NetworkBehaviour {
         stunTimer = stunTime;
     }
 
+    public bool IsGrounded { get {
+            CapsuleCollider col = GetComponent<CapsuleCollider>();
+            return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
+        }
+    }
 
+
+    private void OnDrawGizmos() {
+        CapsuleCollider col = GetComponent<CapsuleCollider>();
+        Gizmos.DrawLine(transform.position,
+            transform.position - Vector3.up * col.height / 2);
+    }
 }
