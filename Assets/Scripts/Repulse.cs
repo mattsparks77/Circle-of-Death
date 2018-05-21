@@ -59,6 +59,10 @@ public class Repulse : NetworkBehaviour {
     [ClientRpc]
     private void RpcApplyForces(GameObject objToApplyTo) {
         Rigidbody rbToApplyTo = objToApplyTo.GetComponent<Rigidbody>();
+        PlayerController pc = objToApplyTo.GetComponent<PlayerController>();
+        if (pc != null) {
+            pc.StunPlayer(repulseStunTime);
+        }
         rbToApplyTo.AddExplosionForce(force, transform.position, radius, upModifier);
         applyForceOnSelf(rbToApplyTo.transform.position);
     }
