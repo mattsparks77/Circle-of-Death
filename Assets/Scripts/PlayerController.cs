@@ -118,14 +118,16 @@ public class PlayerController : NetworkBehaviour {
     //Checks if the player is grounded
     public bool IsGrounded { get {
             CapsuleCollider col = GetComponent<CapsuleCollider>();
-            return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
+            Collider[] collisions = Physics.OverlapSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius);
+            return collisions.Length > 1 || (collisions.Length != 0 && collisions[0] != GetComponent<Collider>());
+            //return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
         }
     }
 
     //Drawing Gizmos for debugging purposes
     private void OnDrawGizmos() {
         CapsuleCollider col = GetComponent<CapsuleCollider>();
-        Gizmos.DrawLine(transform.position,
-            transform.position - Vector3.up * col.height / 2);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius);
     }
 }

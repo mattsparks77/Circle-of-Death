@@ -40,7 +40,6 @@ GameObject:
   - component: {fileID: 23083114778296988}
   - component: {fileID: 114686148044992056}
   - component: {fileID: 114913885594734250}
-  - component: {fileID: 143191835303526892}
   - component: {fileID: 114008925449744654}
   - component: {fileID: 114096057787058754}
   - component: {fileID: 136250631522200140}
@@ -256,12 +255,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawDebugLines: 1
-  hitAngles: 69
-  force: 400
-  hits: []
   radius: 2
-  charge: 0
+  force: 400
   upModifier: 2
+  hitAngles: 69
+  selfRepulseFactor: 0.5
+  repulseStunTime: 0.5
+  selfStunTime: 0.35
 --- !u!136 &136250631522200140
 CapsuleCollider:
   m_ObjectHideFlags: 1
@@ -274,21 +274,4 @@ CapsuleCollider:
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!143 &143191835303526892
-CharacterController:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1687176256308282}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.5000001
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}

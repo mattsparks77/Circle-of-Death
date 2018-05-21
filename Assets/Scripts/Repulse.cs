@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Repulse : NetworkBehaviour{
+public class Repulse : NetworkBehaviour {
 
     //For debugging the repulse raycasting
     public bool DrawDebugLines = false;
@@ -25,12 +25,13 @@ public class Repulse : NetworkBehaviour{
     
 	// Use this for initialization
 	void Start () {
+        controller = GetComponent<PlayerController>();
+
         //Check and disable this script if it's not a local player
         if (!isLocalPlayer) {
             this.enabled = false;
             return;
         }
-        controller = GetComponent<PlayerController>();	
 	}
 
     //Push whatever objects it hits backwards, as well as push the player back
@@ -46,11 +47,22 @@ public class Repulse : NetworkBehaviour{
             //				hit.GetComponent<Rigidbody>().AddExplosionForce(force, pos , radius);
             
             if (rb != null && rb.gameObject != this.gameObject && checkWithinHitRadius(hit)) {
-                rb.AddExplosionForce(force, pos, radius, upModifier);
-                applyForceOnSelf(rb.transform.position);
+                CmdApplyForces(hit.gameObject);
             }
 		}
 	}
+
+    [Command]
+    private void CmdApplyForces(GameObject objToApplyTo) {
+        RpcApplyForces(objToApplyTo);
+    }
+    [ClientRpc]
+    private void RpcApplyForces(GameObject objToApplyTo) {
+        Rigidbody rbToApplyTo = objToApplyTo.GetComponent<Rigidbody>();
+        rbToApplyTo.AddExplosionForce(force, transform.position, radius, upModifier);
+        applyForceOnSelf(rbToApplyTo.transform.position);
+    }
+    
 
     //Apply the force on the player from the direction of where they hit an object, as well as a diminishing factor
     private void applyForceOnSelf(Vector3 hitPosition) {
