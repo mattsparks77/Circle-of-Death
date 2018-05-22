@@ -19,6 +19,7 @@ public class Repulse : NetworkBehaviour {
     [Range(0, 2)] public float selfRepulseFactor = 0.5f;
     [Range(0, 3)] public float repulseStunTime = 0.5f; //TODO make this used
     [Range(0, 3)] public float selfStunTime = 0.35f;
+    [SerializeField] private ParticleSystem particles;
     private Collider[] hits;
     
     private PlayerController controller;
@@ -26,7 +27,7 @@ public class Repulse : NetworkBehaviour {
 	// Use this for initialization
 	void Start () {
         controller = GetComponent<PlayerController>();
-
+        
         //Check and disable this script if it's not a local player
         if (!isLocalPlayer) {
             this.enabled = false;
@@ -34,10 +35,14 @@ public class Repulse : NetworkBehaviour {
         }
 	}
 
+
+
     //Push whatever objects it hits backwards, as well as push the player back
 	void toRepulse()
 	{
-		Vector3 pos = transform.position;
+        CmdSpawnParticles();
+
+        Vector3 pos = transform.position;
 		hits = Physics.OverlapSphere (transform.position, 2.5f);
 
 		foreach (Collider hit in hits)
@@ -53,6 +58,19 @@ public class Repulse : NetworkBehaviour {
 	}
 
     [Command]
+    private void CmdSpawnParticles() {
+        RpcSpawnParticles();
+    }
+
+    [ClientRpc]
+    private void RpcSpawnParticles() {
+        if (particles) {
+            ParticleSystem newParticle = Instantiate(particles, frontOfPlayer(), transform.rotation);
+            newParticle.Play();
+        }
+    }
+
+    [Command]
     private void CmdApplyForces(GameObject objToApplyTo) {
         RpcApplyForces(objToApplyTo);
     }
@@ -63,8 +81,12 @@ public class Repulse : NetworkBehaviour {
         if (pc != null) {
             pc.StunPlayer(repulseStunTime);
         }
-        rbToApplyTo.AddExplosionForce(force, transform.position, radius, upModifier);
-        applyForceOnSelf(rbToApplyTo.transform.position);
+        Vector3 front = frontOfPlayer();
+        float playerRadius = transform.localScale.z / 2;
+        Debug.DrawLine(front, rbToApplyTo.transform.position);
+        rbToApplyTo.AddExplosionForce(force, front, radius, upModifier);
+        Vector3 directionToRB = rbToApplyTo.transform.position - transform.position;
+        applyForceOnSelf(rbToApplyTo.transform.position - directionToRB.normalized * playerRadius);
     }
     
 
@@ -114,6 +136,11 @@ public class Repulse : NetworkBehaviour {
             Vector3 lineVector = Quaternion.Euler(0, i, 0) * transform.forward * radius;
             Gizmos.DrawLine(transform.position, transform.position + lineVector);
         }
+    }
+
+    private Vector3 frontOfPlayer() {
+        float playerRadius = transform.localScale.z / 2;
+        return transform.position + transform.forward * playerRadius;
     }
 
 }
