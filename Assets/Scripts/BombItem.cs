@@ -57,8 +57,9 @@ public class BombItem : NetworkBehaviour {
 				rb.AddExplosionForce(explosionForce, pos, radius, up);
 				
 				transform.parent = null;
-				Destroy(this.gameObject);
+				
 			}
+			Destroy(this.gameObject);
 		}
 	}
 }
