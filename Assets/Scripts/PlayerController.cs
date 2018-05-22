@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour {
-
+	
     Rigidbody rb;
+	public NetworkStartPosition[] spawnPoints;
 	public float speed = 6.0F;
 	public float jumpSpeed = 8.0F;
 	public float gravity = 20.0F;
@@ -21,21 +22,57 @@ public class PlayerController : NetworkBehaviour {
     private int jumpableLayer = 1 << 0;
 
     void Start() {
-        //controller = GetComponent<CharacterController>();
-        killBox = GameObject.FindGameObjectWithTag("KillBox");
-        playerRB = GetComponent<Rigidbody>();
-        CmdAddNewPlayer();
+		//controller = GetComponent<CharacterController>();
+		killBox = GameObject.FindGameObjectWithTag ("KillBox");
+		playerRB = GetComponent<Rigidbody> ();
+		CmdAddNewPlayer ();
 
-        //Check if this player is the client's local player
-        if (isLocalPlayer) {
-            //Set the camera to follow this player if it's local player
-            CameraThirdPerson.SetPlayerTarget(transform);
-        }
-        else {
-            //Don't let other clients control this script if it's not a local player
-            this.enabled = false;
-        }
-    }
+		//Check if this player is the client's local player
+		if (isLocalPlayer) {
+			//Set the camera to follow this player if it's local player
+			CameraThirdPerson.SetPlayerTarget (transform);
+			if (isLocalPlayer) {
+				//Set the camera to follow this player if it's local player
+				CameraThirdPerson.SetPlayerTarget (transform);
+				spawnPoints = FindObjectsOfType<NetworkStartPosition> ();
+			} else {
+				//Don't let other clients control this script if it's not a local player
+				this.enabled = false;
+			}
+		}
+	}
+		void OnCollisionEnter(Collision other)
+		{
+			if (other.gameObject.tag == "DeathBarrier"){
+				RpcDie();
+			}
+		}
+
+		[ClientRpc]
+		void RpcRespawn()
+		{
+			if (isLocalPlayer) {
+				// move back to zero location
+				Vector3 spawnPoint = Vector3.zero;
+				this.gameObject.SetActive (true);
+
+
+				if (spawnPoints != null && spawnPoints.Length != 0) {
+					spawnPoint = spawnPoints [Random.Range (0, spawnPoints.Length)].transform.position;
+				}
+
+				// Set the player’s position to the chosen spawn point
+				transform.position = spawnPoint;
+			}
+		}
+		[ClientRpc]
+		void RpcDie(){
+			this.gameObject.SetActive(false);
+			RpcRespawn ();
+
+		}
+        
+        
 
     [Command]
     private void CmdAddNewPlayer() {
