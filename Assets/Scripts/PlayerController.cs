@@ -11,7 +11,7 @@ public class PlayerController : NetworkBehaviour {
 	public float gravity = 20.0F;
 	public float chargeTimer = 0;
 	private Vector3 moveDirection = Vector3.zero;
-
+    
     private float stunTimer = 0;
 
     //private CharacterController controller;
@@ -19,6 +19,7 @@ public class PlayerController : NetworkBehaviour {
 
     private GameObject killBox;
     private int jumpableLayer = 1 << 0;
+    public bool hasBomb;
 
     void Start() {
         //controller = GetComponent<CharacterController>();
@@ -45,6 +46,9 @@ public class PlayerController : NetworkBehaviour {
     //For dealing with code that are not physics related
     void Update() {
         decrementStunTimer();
+        if (Input.GetKeyDown(KeyCode.E) && hasBomb){
+            CmdDropBomb();
+        }
     }
 
     //For dealing with code that is physics-rigidbody related
@@ -143,9 +147,7 @@ public class PlayerController : NetworkBehaviour {
     public bool IsGrounded { get {
             CapsuleCollider col = GetComponent<CapsuleCollider>();
             Collider[] collisions = Physics.OverlapSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius, jumpableLayer);
-            foreach (Collider c in collisions ) {
-                print(c);
-            }
+
             return collisions.Length > 1 || (collisions.Length != 0 && collisions[0] != GetComponent<Collider>());
             //return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
         }
@@ -162,4 +164,14 @@ public class PlayerController : NetworkBehaviour {
         Gizmos.DrawWireSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius);
     }
 
+    public void SetBomb(bool flag){
+        hasBomb = flag;
+    }
+    
+    [Command]
+    void CmdDropBomb(){
+        GameObject bomb = transform.Find("Bomb(Clone)").gameObject;
+        bomb.GetComponent<BombItem>().RpcDropBomb();
+        SetBomb(false);
+    }
 }

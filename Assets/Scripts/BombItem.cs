@@ -12,32 +12,31 @@ public class BombItem : NetworkBehaviour {
 	float up = 10f;
 	GameObject parent;
 	public float stunTime = 0.75f;
+	PlayerController pc;
 
 	void OnTriggerEnter(Collider collider){
 		if (collider.tag == "Player" && !pickedUp){
-			GetComponent<MeshRenderer>().enabled = false;
-			transform.parent = collider.transform;
-			parent = transform.parent.gameObject;
-			pickedUp = true;
-            Destroy(GetComponent<BoxCollider>());
+			pc = collider.GetComponent<PlayerController>();
+			if (!pc.hasBomb){
+				GetComponent<MeshRenderer>().enabled = false;
+				transform.parent = collider.transform;
+				parent = transform.parent.gameObject;
+				pickedUp = true;
+				pc.SetBomb(true);
+				Destroy(GetComponent<BoxCollider>());
+			}
         }
 	}
-
-	void Update(){
-		if(Input.GetKeyDown(KeyCode.E) && pickedUp && parent.GetComponent<PlayerController>().enabled){
-			CmdDropBomb();
-		}
-	}
-	[Command]
-	void CmdDropBomb(){
-		RpcDropBomb();
-	}
+	
 	[ClientRpc]
-	void RpcDropBomb(){
+	public void RpcDropBomb(){
 		transform.position = transform.parent.position;
 		GetComponent<MeshRenderer>().enabled = true;
 		transform.parent = null;
-		Invoke("CmdExplode", 2.5f);
+		if (!isServer)
+			Invoke("CmdExplode", 2.5f);
+		else
+			Invoke("RpcExplode", 2.5f);
 	}
 
 	[Command]

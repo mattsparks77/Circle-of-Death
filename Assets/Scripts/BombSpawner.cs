@@ -6,9 +6,9 @@ public class BombSpawner : NetworkBehaviour {
 
 	public GameObject BombPrefab;
 	
-	void Awake(){
-		if (isServer)
-			InvokeRepeating("RpcSpawn", 3.5f, 7f);
+	void Start(){
+		if(isServer)
+			CmdStartSpawning();
 	}
 
 	[ClientRpc]
@@ -19,5 +19,8 @@ public class BombSpawner : NetworkBehaviour {
 		GameObject bombClone = Instantiate(BombPrefab, spawnPos, rot);
 		NetworkServer.Spawn(bombClone);
 	}
-
+	[Command]
+	void CmdStartSpawning(){
+		InvokeRepeating("RpcSpawn", 3.5f, 7f);
+	}
 }
