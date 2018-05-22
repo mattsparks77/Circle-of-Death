@@ -256,8 +256,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DrawDebugLines: 1
   radius: 2
-  force: 600
-  upModifier: 2
+  force: 750
+  upModifier: 0.5
   hitAngles: 69
   selfRepulseFactor: 0.5
   repulseStunTime: 0.5
