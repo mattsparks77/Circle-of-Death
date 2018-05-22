@@ -17,9 +17,14 @@ public class PlayerController : NetworkBehaviour {
     //private CharacterController controller;
     private Rigidbody playerRB;
 
+    private GameObject killBox;
+    private int jumpableLayer = 1 << 0;
+
     void Start() {
         //controller = GetComponent<CharacterController>();
+        killBox = GameObject.FindGameObjectWithTag("KillBox");
         playerRB = GetComponent<Rigidbody>();
+        CmdAddNewPlayer();
 
         //Check if this player is the client's local player
         if (isLocalPlayer) {
@@ -32,6 +37,11 @@ public class PlayerController : NetworkBehaviour {
         }
     }
 
+    [Command]
+    private void CmdAddNewPlayer() {
+        GameManager.AddNewPlayer(this.gameObject);
+    }
+
     //For dealing with code that are not physics related
     void Update() {
         decrementStunTimer();
@@ -41,6 +51,10 @@ public class PlayerController : NetworkBehaviour {
     void FixedUpdate() {
         //Turn the y-axis to face where the camera is looking at
         faceDirectionOfCamera();
+
+        if (isOutOfBounds()) {
+            Destroy(gameObject);
+        }
 
         //If the player is stunned, only take in account the gravity
         if (isStunned()) {
@@ -110,6 +124,16 @@ public class PlayerController : NetworkBehaviour {
         stunTimer -= Time.deltaTime;
     }
 
+    private bool isOutOfBounds() {
+        Bounds killBounds = killBox.GetComponent<Collider>().bounds;
+        return !killBounds.Contains(transform.position);
+    }
+
+    [Command]
+    private void CmdKillPlayer() {
+        GameManager.RemovePlayer(this.gameObject);
+    }
+
     //Public variable for stunning the player for an amount of seconds
     public void StunPlayer(float stunTime) {
         stunTimer = stunTime;
@@ -118,10 +142,17 @@ public class PlayerController : NetworkBehaviour {
     //Checks if the player is grounded
     public bool IsGrounded { get {
             CapsuleCollider col = GetComponent<CapsuleCollider>();
-            Collider[] collisions = Physics.OverlapSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius);
+            Collider[] collisions = Physics.OverlapSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius, jumpableLayer);
+            foreach (Collider c in collisions ) {
+                print(c);
+            }
             return collisions.Length > 1 || (collisions.Length != 0 && collisions[0] != GetComponent<Collider>());
             //return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
         }
+    }
+
+    private void OnDestroy() {
+        CmdKillPlayer();
     }
 
     //Drawing Gizmos for debugging purposes
@@ -130,4 +161,5 @@ public class PlayerController : NetworkBehaviour {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius);
     }
+
 }
