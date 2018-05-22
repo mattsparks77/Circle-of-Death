@@ -257,7 +257,7 @@ MonoBehaviour:
   DrawDebugLines: 1
   radius: 2
   force: 600
-  upModifier: 2
+  upModifier: 1
   hitAngles: 69
   selfRepulseFactor: 0.5
   repulseStunTime: 0.5

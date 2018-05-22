@@ -7,7 +7,8 @@ public class BombSpawner : NetworkBehaviour {
 	public GameObject BombPrefab;
 	
 	void Awake(){
-		InvokeRepeating("RpcSpawn", 3.5f, 7f);
+		if (isServer)
+			InvokeRepeating("RpcSpawn", 3.5f, 7f);
 	}
 
 	[ClientRpc]
