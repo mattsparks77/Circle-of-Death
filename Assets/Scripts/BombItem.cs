@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityEngine.Networking;
+using UnityEngine.Networking;
 
-public class BombItem : MonoBehaviour {
+public class BombItem : NetworkBehaviour {
 
 	bool pickedUp = false;
 	Collider[] hits;
 	float explosionForce = 1500f;
 	float radius = 10f;
-	float up = 2f;
+	float up = 10f;
 	GameObject parent;
+	public float stunTime = 0.75f;
 
 	void OnTriggerEnter(Collider collider){
 		if (collider.tag == "Player" && !pickedUp){
@@ -22,22 +23,41 @@ public class BombItem : MonoBehaviour {
 	}
 
 	void Update(){
-		if(Input.GetKeyDown(KeyCode.E) && pickedUp){
-			transform.position = transform.parent.position;
-			GetComponent<MeshRenderer>().enabled = true;
-			transform.parent = null;
-			Invoke("Explode", 2.5f);
+		if(Input.GetKeyDown(KeyCode.E) && pickedUp && parent.GetComponent<PlayerController>().enabled){
+			Debug.Log("E pressed");
+			CmdDropBomb();
 		}
 	}
+	[Command]
+	void CmdDropBomb(){
+		RpcDropBomb();
+	}
+	[ClientRpc]
+	void RpcDropBomb(){
+		Debug.Log("Got drop rpc");
+		transform.position = transform.parent.position;
+		GetComponent<MeshRenderer>().enabled = true;
+		transform.parent = null;
+		Invoke("CmdExplode", 2.5f);
+	}
 
-	void Explode(){
+	[Command]
+	void CmdExplode(){
+		RpcExplode();
+	}
+	[ClientRpc]
+	void RpcExplode(){
 		Vector3 pos = transform.position;
 		hits = Physics.OverlapSphere(pos, 4f);
 		foreach(Collider hit in hits){
 			Rigidbody rb = hit.GetComponent<Rigidbody>();
 
 			if (rb != null && rb.gameObject != parent){
+				PlayerController pc = rb.gameObject.GetComponent<PlayerController>();
+				if (pc != null)
+					pc.StunPlayer(stunTime);
 				rb.AddExplosionForce(explosionForce, pos, radius, up);
+				
 				transform.parent = null;
 				Destroy(this.gameObject);
 			}
