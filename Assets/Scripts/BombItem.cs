@@ -59,7 +59,8 @@ public class BombItem : NetworkBehaviour {
 				transform.parent = null;
 				
 			}
-			Destroy(this.gameObject);
+			
 		}
+		Destroy(this.gameObject);
 	}
 }
