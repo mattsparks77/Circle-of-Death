@@ -24,7 +24,6 @@ public class BombItem : NetworkBehaviour {
 
 	void Update(){
 		if(Input.GetKeyDown(KeyCode.E) && pickedUp && parent.GetComponent<PlayerController>().enabled){
-			Debug.Log("E pressed");
 			CmdDropBomb();
 		}
 	}
@@ -34,7 +33,6 @@ public class BombItem : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcDropBomb(){
-		Debug.Log("Got drop rpc");
 		transform.position = transform.parent.position;
 		GetComponent<MeshRenderer>().enabled = true;
 		transform.parent = null;
