@@ -19,7 +19,8 @@ public class BombItem : NetworkBehaviour {
 			transform.parent = collider.transform;
 			parent = transform.parent.gameObject;
 			pickedUp = true;
-		}
+            Destroy(GetComponent<BoxCollider>());
+        }
 	}
 
 	void Update(){
