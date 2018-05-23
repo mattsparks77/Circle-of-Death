@@ -12,9 +12,9 @@ public class PlayerController : NetworkBehaviour {
 	public float gravity = 20.0F;
 	public float chargeTimer = 0;
 	private Vector3 moveDirection = Vector3.zero;
-    
+    public float respawnTime = 2f;
     private float stunTimer = 0;
-
+    public int playerLives = 3;
     //private CharacterController controller;
     private Rigidbody playerRB;
 
@@ -25,53 +25,24 @@ public class PlayerController : NetworkBehaviour {
     [SerializeField] private ParticleSystem deathParticles;
 
     void Start() {
+        
 		//controller = GetComponent<CharacterController>();
-		killBox = GameObject.FindGameObjectWithTag ("KillBox");
+		//killBox = GameObject.FindGameObjectWithTag ("KillBox");
 		playerRB = GetComponent<Rigidbody> ();
-
+        SetupPlayer();
         //Check if this player is the client's local player
-        if (isLocalPlayer) {
-            //Set the camera to follow this player if it's local player
-            CameraThirdPerson.SetPlayerTarget(transform);
-            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
-            //Add this player to the game manager
-            CmdAddNewPlayer();
-        }
-        else {
-            //Don't let other clients control this script if it's not a local player
-            this.enabled = false;
-        }
+       
 	}
 		void OnCollisionEnter(Collision other)
 		{
 			if (other.gameObject.tag == "DeathBarrier"){
-				RpcDie();
+                Die();
 			}
 		}
 
-		[ClientRpc]
-		void RpcRespawn()
-		{
-			if (isLocalPlayer) {
-				// move back to zero location
-				Vector3 spawnPoint = Vector3.zero;
-				this.gameObject.SetActive (true);
+	
+		
 
-
-				if (spawnPoints != null && spawnPoints.Length != 0) {
-					spawnPoint = spawnPoints [Random.Range (0, spawnPoints.Length)].transform.position;
-				}
-
-				// Set the player’s position to the chosen spawn point
-				transform.position = spawnPoint;
-			}
-		}
-		[ClientRpc]
-		void RpcDie(){
-			this.gameObject.SetActive(false);
-			RpcRespawn ();
-
-		}
         
         
 
@@ -87,16 +58,69 @@ public class PlayerController : NetworkBehaviour {
             CmdDropBomb();
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "DeathBarrier"){
+            Die();
+        }
+    }
+    public void Die()
+    {
+        //isDead = true;
+        playerLives--;
+        Instantiate(deathParticles, transform.position, transform.rotation);
+        this.gameObject.SetActive(false);
+        StartCoroutine(Respawn());
 
+    }
+    private IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(respawnTime);
+        this.gameObject.SetActive(true);
+        if (isLocalPlayer)
+        {
+            // move back to zero location
+            Vector3 spawnPoint = Vector3.zero;
+           
+
+
+            if (spawnPoints != null && spawnPoints.Length != 0)
+            {
+                spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+            }
+
+            // Set the player’s position to the chosen spawn point
+            transform.position = spawnPoint;
+            SetupPlayer();
+        }
+    }
+    public void SetupPlayer()
+    {
+        if (isLocalPlayer)
+        {
+            this.gameObject.SetActive(true);
+            //Set the camera to follow this player if it's local player
+            CameraThirdPerson.SetPlayerTarget(transform);
+            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+            //Add this player to the game manager
+            CmdAddNewPlayer();
+        }
+        else
+        {
+            //Don't let other clients control this script if it's not a local player
+            this.enabled = false;
+        }
+
+    }
     //For dealing with code that is physics-rigidbody related
     void FixedUpdate() {
         //Turn the y-axis to face where the camera is looking at
         faceDirectionOfCamera();
 
-        if (isOutOfBounds()) {
-            CmdKillPlayer();
-            this.enabled = false;
-        }
+        //if (isOutOfBounds()) {
+        //    CmdKillPlayer();
+        //    this.enabled = false;
+        //}
 
         //If the player is stunned, only take in account the gravity
         if (isStunned()) {
@@ -166,21 +190,22 @@ public class PlayerController : NetworkBehaviour {
         stunTimer -= Time.deltaTime;
     }
 
-    private bool isOutOfBounds() {
-        Bounds killBounds = killBox.GetComponent<Collider>().bounds;
-        return !killBounds.Contains(transform.position);
-    }
+    //private bool isOutOfBounds() {
+    //    Bounds killBounds = killBox.GetComponent<Collider>().bounds;
+    //    return !killBounds.Contains(transform.position);
+    //}
 
-    [Command]
-    private void CmdKillPlayer() {
-        GameManager.RemovePlayer(this.gameObject);
-        RpcKillPlayer();
-    }
+    //[Command]
+    //private void CmdKillPlayer() {
+    //    GameManager.RemovePlayer(this.gameObject);
+    //    RpcKillPlayer();
+    //}
 
     [ClientRpc]
-    private void RpcKillPlayer() {
+    private void RpcSpawnDeathParticles() {
         Instantiate(deathParticles, transform.position, transform.rotation);
-        this.gameObject.active = false;
+
+        //this.gameObject.active = false;
         //Destroy(gameObject);
     }
 
