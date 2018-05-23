@@ -22,25 +22,25 @@ public class PlayerController : NetworkBehaviour {
     private int jumpableLayer = 1 << 0;
     public bool hasBomb;
 
+    [SerializeField] private ParticleSystem deathParticles;
+
     void Start() {
 		//controller = GetComponent<CharacterController>();
 		killBox = GameObject.FindGameObjectWithTag ("KillBox");
 		playerRB = GetComponent<Rigidbody> ();
-		CmdAddNewPlayer ();
 
-		//Check if this player is the client's local player
-		if (isLocalPlayer) {
-			//Set the camera to follow this player if it's local player
-			CameraThirdPerson.SetPlayerTarget (transform);
-			if (isLocalPlayer) {
-				//Set the camera to follow this player if it's local player
-				CameraThirdPerson.SetPlayerTarget (transform);
-				spawnPoints = FindObjectsOfType<NetworkStartPosition> ();
-			} else {
-				//Don't let other clients control this script if it's not a local player
-				this.enabled = false;
-			}
-		}
+        //Check if this player is the client's local player
+        if (isLocalPlayer) {
+            //Set the camera to follow this player if it's local player
+            CameraThirdPerson.SetPlayerTarget(transform);
+            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+            //Add this player to the game manager
+            CmdAddNewPlayer();
+        }
+        else {
+            //Don't let other clients control this script if it's not a local player
+            this.enabled = false;
+        }
 	}
 		void OnCollisionEnter(Collision other)
 		{
@@ -94,7 +94,8 @@ public class PlayerController : NetworkBehaviour {
         faceDirectionOfCamera();
 
         if (isOutOfBounds()) {
-            Destroy(gameObject);
+            CmdKillPlayer();
+            this.enabled = false;
         }
 
         //If the player is stunned, only take in account the gravity
@@ -173,6 +174,14 @@ public class PlayerController : NetworkBehaviour {
     [Command]
     private void CmdKillPlayer() {
         GameManager.RemovePlayer(this.gameObject);
+        RpcKillPlayer();
+    }
+
+    [ClientRpc]
+    private void RpcKillPlayer() {
+        Instantiate(deathParticles, transform.position, transform.rotation);
+        this.gameObject.active = false;
+        //Destroy(gameObject);
     }
 
     //Public variable for stunning the player for an amount of seconds
@@ -189,11 +198,7 @@ public class PlayerController : NetworkBehaviour {
             //return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
         }
     }
-
-    private void OnDestroy() {
-        CmdKillPlayer();
-    }
-
+    
     //Drawing Gizmos for debugging purposes
     private void OnDrawGizmos() {
         CapsuleCollider col = GetComponent<CapsuleCollider>();
