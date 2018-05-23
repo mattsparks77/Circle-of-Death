@@ -244,9 +244,14 @@ MonoBehaviour:
   jumpSpeed: 8
   gravity: 20
   chargeTimer: 0
+  respawnTime: 2
+  playerLives: 3
+  disableOnDeath: []
+  disableGameObjectsOnDeath: []
   hasBomb: 0
   deathParticles: {fileID: 198690051567226180, guid: 0fd7066237194a44ebfa744a3815b000,
     type: 2}
+  spawnParticles: {fileID: 0}
 --- !u!114 &114913885594734250
 MonoBehaviour:
   m_ObjectHideFlags: 1

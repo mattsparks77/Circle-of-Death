@@ -18,11 +18,14 @@ public class PlayerController : NetworkBehaviour {
     //private CharacterController controller;
     private Rigidbody playerRB;
 
-    private GameObject killBox;
+    [SerializeField] private Behaviour[] disableOnDeath;
+    private bool[] wasEnabled;
+    [SerializeField] private GameObject[] disableGameObjectsOnDeath;
     private int jumpableLayer = 1 << 0;
     public bool hasBomb;
 
     [SerializeField] private ParticleSystem deathParticles;
+    [SerializeField] private ParticleSystem spawnParticles;
 
     void Start() {
         
@@ -40,11 +43,28 @@ public class PlayerController : NetworkBehaviour {
 			}
 		}
 
-	
-		
 
-        
-        
+    public void SetupPlayer()
+    {
+        if (isLocalPlayer)
+        {
+            this.gameObject.SetActive(true);
+            //Set the camera to follow this player if it's local player
+            CameraThirdPerson.SetPlayerTarget(transform);
+            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+            //Add this player to the game manager
+            CmdAddNewPlayer();
+        }
+        else
+        {
+            //Don't let other clients control this script if it's not a local player
+            this.enabled = false;
+        }
+
+    }
+
+
+
 
     [Command]
     private void CmdAddNewPlayer() {
@@ -94,24 +114,7 @@ public class PlayerController : NetworkBehaviour {
             SetupPlayer();
         }
     }
-    public void SetupPlayer()
-    {
-        if (isLocalPlayer)
-        {
-            this.gameObject.SetActive(true);
-            //Set the camera to follow this player if it's local player
-            CameraThirdPerson.SetPlayerTarget(transform);
-            spawnPoints = FindObjectsOfType<NetworkStartPosition>();
-            //Add this player to the game manager
-            CmdAddNewPlayer();
-        }
-        else
-        {
-            //Don't let other clients control this script if it's not a local player
-            this.enabled = false;
-        }
-
-    }
+    
     //For dealing with code that is physics-rigidbody related
     void FixedUpdate() {
         //Turn the y-axis to face where the camera is looking at
@@ -152,13 +155,13 @@ public class PlayerController : NetworkBehaviour {
 
         //If player has movement dash charged, put moveDirection to take this into account
 		if (Input.GetKeyUp (KeyCode.Mouse0) && chargeTimer > 2) {
-			Debug.Log ("MOVE: " +  moveDirection.ToString ());
+			
             //			if (moveDirection.x <= 0) {
             //				transform.forward *= 2;
             //			}
             //				controller.Move(new Vector3(10f, -1*gravity * Time.deltaTime,0f));
             //			else {
-            moveDirection = moveDirection * chargeTimer * 3f;
+            moveDirection = moveDirection * 6f;
             
 		    chargeTimer = 0;
 

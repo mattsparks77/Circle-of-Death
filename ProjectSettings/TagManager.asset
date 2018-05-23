@@ -7,6 +7,7 @@ TagManager:
   - Explodeable
   - Bomb
   - KillBox
+  - DeathBarrier
   layers:
   - Default
   - TransparentFX
