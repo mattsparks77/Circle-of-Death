@@ -9,7 +9,7 @@ public class BombItem : NetworkBehaviour {
 	Collider[] hits;
 	float explosionForce = 1500f;
 	float radius = 10f;
-	float up = 10f;
+	float up = 12f;
 	GameObject parent;
 	public float stunTime = 0.75f;
 	PlayerController pc;
@@ -30,19 +30,11 @@ public class BombItem : NetworkBehaviour {
 	
 	[ClientRpc]
 	public void RpcDropBomb(){
-		transform.position = transform.parent.position;
 		GetComponent<MeshRenderer>().enabled = true;
 		transform.parent = null;
-		if (!isServer)
-			Invoke("CmdExplode", 2.5f);
-		else
-			Invoke("RpcExplode", 2.5f);
+		Invoke("RpcExplode", 2.5f);
 	}
 
-	[Command]
-	void CmdExplode(){
-		RpcExplode();
-	}
 	[ClientRpc]
 	void RpcExplode(){
 		Vector3 pos = transform.position;

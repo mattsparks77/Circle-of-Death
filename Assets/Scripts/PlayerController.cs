@@ -83,7 +83,7 @@ public class PlayerController : NetworkBehaviour {
     //For dealing with code that are not physics related
     void Update() {
         decrementStunTimer();
-        if (Input.GetKeyDown(KeyCode.E) && hasBomb){
+        if (Input.GetKeyDown(KeyCode.E) && hasBomb && isLocalPlayer){
             CmdDropBomb();
         }
     }

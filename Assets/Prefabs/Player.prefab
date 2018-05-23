@@ -239,10 +239,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196d355b5e05a4896a1e408d825af2a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints: []
   speed: 6
   jumpSpeed: 8
   gravity: 20
   chargeTimer: 0
+  hasBomb: 0
 --- !u!114 &114913885594734250
 MonoBehaviour:
   m_ObjectHideFlags: 1
