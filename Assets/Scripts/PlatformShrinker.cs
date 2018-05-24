@@ -5,27 +5,23 @@ using UnityEngine.Networking;
 
 public class PlatformShrinker : NetworkBehaviour {
     
-    private Vector3 original_scale;
-    private float platform_x;
-    private float platform_z;
-    private float play_time;
-    private const float round_time = 30f;
+    [Header("Shrinking Details")]
+    [Range(0.0f, 120f)]public float m_timeAlive = 30f;
+    [Range(0.001f, 0.99f)]public float m_minimumThreshold = 0.05f;
 
-	// Use this for initialization
-	void Start () {
+    private Vector3 original_scale;
+
+    // Use this for initialization
+    void Start () {
         original_scale = gameObject.transform.localScale;
-        //platform_x = platform.localScale.x;
-        //platform_z = platform.localScale.z;
-        play_time = 0.0f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        play_time += Time.deltaTime;
-        gameObject.transform.localScale -= (Time.deltaTime / round_time) * original_scale;
+        gameObject.transform.localScale -= (Time.deltaTime / m_timeAlive) * original_scale;
 
-        if (gameObject.transform.localScale.x < original_scale.x * 0.05 ||
-            gameObject.transform.localScale.z < original_scale.y * 0.05)
+        if (gameObject.transform.localScale.x < original_scale.x * m_minimumThreshold ||
+            gameObject.transform.localScale.z < original_scale.y * m_minimumThreshold)
         {
             Destroy(gameObject);
         }
