@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Explodeable
   - Bomb
+  - KillBox
+  - DeathBarrier
   layers:
   - Default
   - TransparentFX
@@ -16,7 +18,7 @@ TagManager:
   - 
   - 
   - Explodeable
-  - 
+  - NotGround
   - 
   - 
   - 

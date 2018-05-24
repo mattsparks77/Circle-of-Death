@@ -239,10 +239,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196d355b5e05a4896a1e408d825af2a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnPoints: []
   speed: 6
   jumpSpeed: 8
   gravity: 20
   chargeTimer: 0
+  respawnTime: 2
+  playerLives: 3
+  disableOnDeath: []
+  disableGameObjectsOnDeath: []
+  hasBomb: 0
+  deathParticles: {fileID: 198690051567226180, guid: 0fd7066237194a44ebfa744a3815b000,
+    type: 2}
+  spawnParticles: {fileID: 0}
 --- !u!114 &114913885594734250
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -257,7 +266,7 @@ MonoBehaviour:
   DrawDebugLines: 1
   radius: 2
   force: 750
-  upModifier: 0.5
+  upModifier: 0.95
   hitAngles: 69
   selfRepulseFactor: 0.5
   repulseStunTime: 0.5
