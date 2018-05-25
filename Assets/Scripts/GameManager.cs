@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //print(playersAlive.Count);
+        print(playersAlive.Count);
         if (!had1Player) {
             return;
         }
@@ -56,6 +56,10 @@ public class GameManager : MonoBehaviour {
         had1Player = false;
         had2Players = false;
         restarting = false;
+        foreach (GameObject obj in playersAlive) {
+            Destroy(obj);
+        }
+        playersAlive.Clear();
         manager.ServerChangeScene("JeffsTestScene");
     }
 }
