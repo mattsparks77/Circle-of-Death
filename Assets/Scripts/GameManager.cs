@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //print(playersAlive.Count);
+        print(playersAlive.Count);
         if (!had1Player) {
             return;
         }

@@ -27,21 +27,23 @@ public class PlayerController : NetworkBehaviour {
     [SerializeField] private ParticleSystem deathParticles;
     [SerializeField] private ParticleSystem spawnParticles;
 
+    private GameObject killBox;
+
     void Start() {
-        
-		//controller = GetComponent<CharacterController>();
-		//killBox = GameObject.FindGameObjectWithTag ("KillBox");
-		playerRB = GetComponent<Rigidbody> ();
+
+        //controller = GetComponent<CharacterController>();
+        killBox = GameObject.FindGameObjectWithTag("KillBox");
+        playerRB = GetComponent<Rigidbody> ();
         SetupPlayer();
         //Check if this player is the client's local player
        
 	}
-		void OnCollisionEnter(Collision other)
-		{
-			if (other.gameObject.tag == "DeathBarrier"){
-                Die();
-			}
+	void OnCollisionEnter(Collision other)
+	{
+		if (other.gameObject.tag == "DeathBarrier"){
+            Die();
 		}
+	}
 
 
     public void SetupPlayer()
@@ -120,10 +122,10 @@ public class PlayerController : NetworkBehaviour {
         //Turn the y-axis to face where the camera is looking at
         faceDirectionOfCamera();
 
-        //if (isOutOfBounds()) {
-        //    CmdKillPlayer();
-        //    this.enabled = false;
-        //}
+        if (isOutOfBounds()) {
+            CmdKillPlayer();
+            this.enabled = false;
+        }
 
         //If the player is stunned, only take in account the gravity
         if (isStunned()) {
@@ -193,23 +195,23 @@ public class PlayerController : NetworkBehaviour {
         stunTimer -= Time.deltaTime;
     }
 
-    //private bool isOutOfBounds() {
-    //    Bounds killBounds = killBox.GetComponent<Collider>().bounds;
-    //    return !killBounds.Contains(transform.position);
-    //}
+    private bool isOutOfBounds() {
+        Bounds killBounds = killBox.GetComponent<Collider>().bounds;
+        return !killBounds.Contains(transform.position);
+    }
 
-    //[Command]
-    //private void CmdKillPlayer() {
-    //    GameManager.RemovePlayer(this.gameObject);
-    //    RpcKillPlayer();
-    //}
+    [Command]
+    private void CmdKillPlayer() {
+        GameManager.RemovePlayer(this.gameObject);
+        RpcSpawnDeathParticles();
+    }
 
     [ClientRpc]
     private void RpcSpawnDeathParticles() {
         Instantiate(deathParticles, transform.position, transform.rotation);
 
         //this.gameObject.active = false;
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     //Public variable for stunning the player for an amount of seconds
@@ -221,7 +223,6 @@ public class PlayerController : NetworkBehaviour {
     public bool IsGrounded { get {
             CapsuleCollider col = GetComponent<CapsuleCollider>();
             Collider[] collisions = Physics.OverlapSphere(transform.position - Vector3.up * (col.height / 2 - col.radius), col.radius, jumpableLayer);
-
             return collisions.Length > 1 || (collisions.Length != 0 && collisions[0] != GetComponent<Collider>());
             //return Physics.Raycast(transform.position, Vector3.down, col.height / 2);
         }
