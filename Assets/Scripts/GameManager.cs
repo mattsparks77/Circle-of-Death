@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        print(playersAlive.Count);
+        //print(playersAlive.Count);
         if (!had1Player) {
             return;
         }
@@ -45,6 +45,10 @@ public class GameManager : MonoBehaviour {
 
     public static void RemovePlayer(GameObject deadPlayer) {
         playersAlive.Remove(deadPlayer);
+    }
+
+    public static int ReturnPlayers(){
+        return playersAlive.Count;
     }
 
     private static IEnumerator restartScene(float secondsUntilRestart) {
