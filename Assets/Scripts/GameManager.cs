@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
         playersAlive.Remove(deadPlayer);
     }
 
-    public static int ReturnPlayers(){
+    public int ReturnPlayers(){
         return playersAlive.Count;
     }
 

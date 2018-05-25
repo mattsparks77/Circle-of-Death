@@ -22,7 +22,7 @@ public class PlayerController : NetworkBehaviour {
     private bool[] wasEnabled;
     [SerializeField] private GameObject[] disableGameObjectsOnDeath;
     private int jumpableLayer = 1 << 0;
-    public bool hasBomb;
+    public bool hasBomb = false;
 
     [SerializeField] private ParticleSystem deathParticles;
     [SerializeField] private ParticleSystem spawnParticles;
@@ -34,6 +34,7 @@ public class PlayerController : NetworkBehaviour {
         //controller = GetComponent<CharacterController>();
         killBox = GameObject.FindGameObjectWithTag("KillBox");
         playerRB = GetComponent<Rigidbody> ();
+        hasBomb = false;
         SetupPlayer();
         //Check if this player is the client's local player
        
@@ -243,6 +244,5 @@ public class PlayerController : NetworkBehaviour {
     void CmdDropBomb(){
         GameObject bomb = transform.Find("Bomb(Clone)").gameObject;
         bomb.GetComponent<BombItem>().RpcDropBomb();
-        SetBomb(false);
     }
 }

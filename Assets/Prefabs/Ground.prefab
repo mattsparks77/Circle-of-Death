@@ -24,6 +24,9 @@ GameObject:
   - component: {fileID: 23451635756095426}
   - component: {fileID: 65190244480151654}
   - component: {fileID: 114498847235117716}
+  - component: {fileID: 114664750272726660}
+  - component: {fileID: 114099153314177300}
+  - component: {fileID: 114513698002011878}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -39,7 +42,7 @@ Transform:
   m_GameObject: {fileID: 1781877580999230}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -53,7 +56,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -111,6 +114,27 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114099153314177300
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1781877580999230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 1
+  m_SendInterval: 0.1
+  m_SyncRotationAxis: 7
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1
 --- !u!114 &114498847235117716
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -123,3 +147,48 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BombPrefab: {fileID: 1549521690351104, guid: 4a0db18c0692ec946862b32646891c19, type: 2}
+--- !u!114 &114513698002011878
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1781877580999230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a598a4b91bc0848ac771b28b3939d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_timeAlive: 30
+  m_minimumThreshold: 0.05
+--- !u!114 &114664750272726660
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1781877580999230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 173
+    i1: 20
+    i2: 114
+    i3: 79
+    i4: 216
+    i5: 116
+    i6: 166
+    i7: 84
+    i8: 123
+    i9: 216
+    i10: 28
+    i11: 54
+    i12: 55
+    i13: 74
+    i14: 142
+    i15: 251
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0

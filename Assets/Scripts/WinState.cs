@@ -16,11 +16,13 @@ public class WinState : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (GameObject.FindGameObjectsWithTag("Player").Length > 1)
+		if (GameObject.FindGameObjectsWithTag("Player").Length > 1){
 			started = true;
+		}
 		if (GameObject.FindGameObjectsWithTag("Player").Length <= 1 && started){
 			winUI.SetActive(true);
 			started = false;
 		}
 	}
+
 }

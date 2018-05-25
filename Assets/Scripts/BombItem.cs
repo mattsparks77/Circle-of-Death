@@ -32,6 +32,7 @@ public class BombItem : NetworkBehaviour {
 	public void RpcDropBomb(){
 		GetComponent<MeshRenderer>().enabled = true;
 		transform.parent = null;
+		pc.SetBomb(false);
 		Invoke("RpcExplode", 2.5f);
 	}
 
